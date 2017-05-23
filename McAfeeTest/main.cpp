@@ -11,7 +11,6 @@
 #include <vector>
 #include <sstream>
 #include "Node.hpp"
-#include "Linked_List.hpp"
 #include <sys/wait.h>
 #include <sys/types.h>
 #include <unistd.h>
@@ -21,24 +20,7 @@
 #include <sys/ipc.h>
 #include <sys/shm.h>
 
-
-
-
 using namespace std;
-
-
-//When I had trouble getting my linked list into shared memory I created these structs to see if they'd be easier to get into shared memory.
-typedef struct node_obj {
-    struct node_obj * next;
-    struct node_obj * prev;
-    int num;
-} node_obj;
-
-typedef struct Linked_List_object{
-    struct node_obj * head;
-    int length;
-    
-}Linked_List_object;
 
 Node * swap(Node* curr, Node* prev_node){
     if(prev_node->prev != NULL){
@@ -108,40 +90,7 @@ void delete_duplicates(int seg_id, int length){
 
 int main(int argc, const char * argv[]) {
     
-    
-    //Reading in numbers from the command line, placing them in the list and sorting the list
-//    cout << "Please enter a list of numbers, each number should be seperated by a space: ";
-//    string input;
-//    getline(cin, input);
-//    istringstream iss(input);
-//    Linked_List list = Linked_List();
-//    for( int s; iss >> s; ){
-//        Node* n = new Node(NULL, s);
-//        list.add(n);
-//    }
-    
-//    list.sort();
-//    list.delete_duplicates();
-//    list.print();
-    
-    
-//    //Forking a process and using mapped memory to change an integer.
-//    cout<<endl<<"Example of sharing a variable between two processes."<<endl;
-//    int * shared_int = (int*)mmap(0, sizeof(int), PROT_READ|PROT_WRITE, MAP_SHARED|MAP_ANONYMOUS, -1, 0);
-//    *shared_int = 5;
-//    cout<<"Origional number = "<<*shared_int<<endl;
-//    pid_t pid = fork();
-//    if (pid == 0){ //child process
-//        *shared_int = 50;
-//    }
-//    else{ //parent process
-//        wait(NULL);
-//        cout<<"Child process changed number to "<<*shared_int<<endl;
-//    }
-    
-    //Setting up shared memory segment using shmget
-    
-    
+
     key_t key = 9876;
     int seg_id = shmget(key, 2048, IPC_CREAT | 0644);
 
@@ -179,20 +128,37 @@ int main(int argc, const char * argv[]) {
     }
 
     pid_t pid = fork();
-    if (pid == 0){
+    if (pid == 0){ //child process
         sort(seg_id, length);
         delete_duplicates(seg_id, length);
-        cout<<"Done with Child"<<endl;
     }
     else {
-        wait(NULL);
-        cout<<"Starting Parent"<<endl;
+        wait(NULL); // waiting for child process
         Node * shared_mem = (Node*) shmat(seg_id, (void *)0, 0);
         shared_mem = shared_mem->next;
         while(shared_mem != NULL){
             cout<<shared_mem->num<< " ";
             shared_mem = shared_mem->next;
         }
+        string in;
+        cout<<endl<<"Is the list correct? (enter y or n) ";
+        getline(cin, in);
+        while (in != "y" && in != "Y" && in != "n" && in != "N"){
+            cout<<endl<<"Please enter y or n ";
+            in = "";
+            getline(cin, in);
+            
+        }
+        if (in == "y" || in == "Y"){
+            cout<<"Perfect!"<<endl;
+            return 0;
+        }
+        else{
+            cout<<"Sorry I must have made a mistake."<<endl;
+            return 0;
+        }
+
+        
     }
 
 
