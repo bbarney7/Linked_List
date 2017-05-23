@@ -92,7 +92,7 @@ int main(int argc, const char * argv[]) {
     
 
     key_t key = 9876;
-    int seg_id = shmget(key, 2048, IPC_CREAT | 0644);
+    int seg_id = shmget(key, 1024, IPC_CREAT | 0644);
 
     
     Node * start = (Node*) shmat(seg_id, (void *)0, 0);
@@ -104,11 +104,17 @@ int main(int argc, const char * argv[]) {
     shared_mem++;
     bool correctInput = false;
     while (!correctInput){
-        cout << "Please enter a list of numbers, each number should be seperated by a space: ";
+        cout << "Please enter a list of integers, each integer should be seperated by a space: ";
         string input;
         getline(cin, input);
         istringstream iss(input);
+        int counter = 0;
         for( int s; iss >> s; ){
+            counter++;
+            if (counter > 115){
+                cout<<"Error! Too many numbers entered!"<<endl;
+                return 1;
+            }
             if (first){
                 first = false;
                 *(shared_mem) = * new Node (NULL,s, (shared_mem-1));
@@ -123,16 +129,19 @@ int main(int argc, const char * argv[]) {
                 length++;
             }
         }
+        correctInput = true;
         if(!iss.eof()){
-            cout <<"You must enter in a list of integers seperated by a space. Please try again."<<endl;;
+            cout <<"You must enter in a list of integers seperated by a space. ";;
             correctInput = false;
             cin.clear();
             iss.str("");
             input = "";
+            counter = 0;
         }
         else{
             correctInput = true;
         }
+        
     }
 
     
