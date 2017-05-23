@@ -89,12 +89,9 @@ void delete_duplicates(int seg_id, int length){
 }
 
 int main(int argc, const char * argv[]) {
-    
 
     key_t key = 9876;
     int seg_id = shmget(key, 1024, IPC_CREAT | 0644);
-
-    
     Node * start = (Node*) shmat(seg_id, (void *)0, 0);
     Node * shared_mem = start;
     bool first = true;
@@ -143,13 +140,11 @@ int main(int argc, const char * argv[]) {
         }
         
     }
-
     
     if (shmdt(start) == -1){
         perror("shmdt");
         exit(1);
     }
-
     pid_t pid = fork();
     if (pid == 0){ //child process
         sort(seg_id, length);
@@ -180,9 +175,6 @@ int main(int argc, const char * argv[]) {
             cout<<"Sorry I must have made a mistake."<<endl;
             return 0;
         }
-
         
     }
-
-
 }
