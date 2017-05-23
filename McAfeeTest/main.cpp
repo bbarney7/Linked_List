@@ -99,48 +99,36 @@ int main(int argc, const char * argv[]) {
     *(shared_mem) = * new Node(NULL, NULL, NULL);
     shared_mem->isHead = true;
     shared_mem++;
-    bool correctInput = false;
-    while (!correctInput){
-        shared_mem = start;
-        cout << "Please enter a list of integers, each integer should be seperated by a space: ";
-        string input;
-        getline(cin, input);
-        istringstream iss(input);
-        int counter = 0;
-        for( int s; iss >> s; ){
-            counter++;
-            if (counter > 115){
-                cout<<"Error! Too many numbers entered!"<<endl;
-                return 1;
-            }
-            if (first){
-                first = false;
-                *(shared_mem) = * new Node (NULL,s, (shared_mem-1));
-                (shared_mem-1)->next = shared_mem;
-                shared_mem++;
-                length++;
-            }
-            else{
-                *(shared_mem) = * new Node(NULL, s, (shared_mem-1));
-                (shared_mem-1)->next = shared_mem;
-                shared_mem++;
-                length++;
-            }
+    cout << "Please enter a list of integers, each integer should be seperated by a space: ";
+    string input;
+    getline(cin, input);
+    istringstream iss(input);
+    int counter = 0;
+    for( int s; iss >> s; ){
+        counter++;
+        if (counter > 115){
+            cout<<"Error! Too many numbers entered!"<<endl;
+            return 1;
         }
-        correctInput = true;
-        if(!iss.eof()){
-            cout <<"You must enter in a list of integers seperated by a space. ";;
-            correctInput = false;
-            cin.clear();
-            iss.str("");
-            input = "";
-            counter = 0;
+        if (first){
+            first = false;
+            *(shared_mem) = * new Node (NULL,s, (shared_mem-1));
+            (shared_mem-1)->next = shared_mem;
+            shared_mem++;
+            length++;
         }
         else{
-            correctInput = true;
+            *(shared_mem) = * new Node(NULL, s, (shared_mem-1));
+            (shared_mem-1)->next = shared_mem;
+            shared_mem++;
+            length++;
         }
-        
     }
+    if(!iss.eof()){
+        cout <<"Error! You must enter a list of integers seperated by a space. ";;
+        return 1;
+    }
+
     
     if (shmdt(start) == -1){
         perror("shmdt");
