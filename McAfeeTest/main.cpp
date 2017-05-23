@@ -94,10 +94,7 @@ int main(int argc, const char * argv[]) {
     key_t key = 9876;
     int seg_id = shmget(key, 2048, IPC_CREAT | 0644);
 
-    cout << "Please enter a list of numbers, each number should be seperated by a space: ";
-    string input;
-    getline(cin, input);
-    istringstream iss(input);
+    
     Node * start = (Node*) shmat(seg_id, (void *)0, 0);
     Node * shared_mem = start;
     bool first = true;
@@ -105,22 +102,39 @@ int main(int argc, const char * argv[]) {
     *(shared_mem) = * new Node(NULL, NULL, NULL);
     shared_mem->isHead = true;
     shared_mem++;
-    for( int s; iss >> s; ){
-        if (first){
-            first = false;
-            *(shared_mem) = * new Node (NULL,s, (shared_mem-1));
-            (shared_mem-1)->next = shared_mem;
-            shared_mem++;
-            length++;
-            
+    bool correctInput = false;
+    while (!correctInput){
+        cout << "Please enter a list of numbers, each number should be seperated by a space: ";
+        string input;
+        getline(cin, input);
+        istringstream iss(input);
+        for( int s; iss >> s; ){
+            if (first){
+                first = false;
+                *(shared_mem) = * new Node (NULL,s, (shared_mem-1));
+                (shared_mem-1)->next = shared_mem;
+                shared_mem++;
+                length++;
+            }
+            else{
+                *(shared_mem) = * new Node(NULL, s, (shared_mem-1));
+                (shared_mem-1)->next = shared_mem;
+                shared_mem++;
+                length++;
+            }
+        }
+        if(!iss.eof()){
+            cout <<"You must enter in a list of integers seperated by a space. Please try again."<<endl;;
+            correctInput = false;
+            cin.clear();
+            iss.str("");
+            input = "";
         }
         else{
-            *(shared_mem) = * new Node(NULL, s, (shared_mem-1));
-            (shared_mem-1)->next = shared_mem;
-            shared_mem++;
-            length++;
+            correctInput = true;
         }
     }
+
     
     if (shmdt(start) == -1){
         perror("shmdt");
