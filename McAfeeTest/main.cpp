@@ -125,7 +125,7 @@ int main(int argc, const char * argv[]) {
         }
     }
     if(!iss.eof()){
-        cout <<"Error! You must enter a list of integers seperated by a space. ";;
+        cout <<"Error! You must enter a list of integers seperated by a space. "<<endl;
         return 1;
     }
 
