@@ -101,6 +101,7 @@ int main(int argc, const char * argv[]) {
     shared_mem++;
     bool correctInput = false;
     while (!correctInput){
+        shared_mem = start;
         cout << "Please enter a list of integers, each integer should be seperated by a space: ";
         string input;
         getline(cin, input);
