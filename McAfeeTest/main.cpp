@@ -94,7 +94,6 @@ int main(int argc, const char * argv[]) {
     int seg_id = shmget(key, 1024, IPC_CREAT | 0644);
     Node * start = (Node*) shmat(seg_id, (void *)0, 0);
     Node * shared_mem = start;
-    bool first = true;
     int length = 0;
     *(shared_mem) = * new Node(NULL, NULL, NULL);
     shared_mem->isHead = true;
@@ -110,21 +109,14 @@ int main(int argc, const char * argv[]) {
             cout<<"Error! Too many numbers entered!"<<endl;
             return 1;
         }
-        if (first){
-            first = false;
-            *(shared_mem) = * new Node (NULL,s, (shared_mem-1));
-            (shared_mem-1)->next = shared_mem;
-            shared_mem++;
-            length++;
-        }
-        else{
-            *(shared_mem) = * new Node(NULL, s, (shared_mem-1));
-            (shared_mem-1)->next = shared_mem;
-            shared_mem++;
-            length++;
-        }
+        
+        *(shared_mem) = * new Node(NULL, s, (shared_mem-1)); //placing the node into shared mem
+        (shared_mem-1)->next = shared_mem;
+        shared_mem++;
+        length++;
+        
     }
-    if(!iss.eof()){
+    if(!iss.eof()){ //Give error if the list contains non-integers
         cout <<"Error! You must enter a list of integers seperated by a space. "<<endl;
         return 1;
     }
@@ -134,7 +126,7 @@ int main(int argc, const char * argv[]) {
         perror("shmdt");
         exit(1);
     }
-    pid_t pid = fork();
+    pid_t pid = fork(); //fork processes
     if (pid == 0){ //child process
         sort(seg_id, length);
         delete_duplicates(seg_id, length);
